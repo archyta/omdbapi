@@ -20,16 +20,18 @@ class GetMovie:
     api_key: str
     values: dict = field(default_factory=dict)
 
-    def get_movie(self, title, plot=None):
+    def get_movie(self, title, year=None, kind=None, plot=None):
         """
         Get all data movie.
         :param title: movie title to search
+        :param y: year
+        :param kind: movie, series or episode
         :param plot: by default return short plot
         :Example:
         movie.get_movie(title='Interstellar', plot='full')
         """
         url = 'http://www.omdbapi.com/'
-        payload = {'t': title, 'plot': plot, 'r': 'json', 'apikey': self.api_key}
+        payload = {'t': title, 'y': year, 'type': kind, 'plot': plot, 'r': 'json', 'apikey': self.api_key}
         result = requests.get(url, params=payload).json()
 
         if result.pop('Response') == 'False':
