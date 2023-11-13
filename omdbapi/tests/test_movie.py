@@ -2,8 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from omdbapi import movie_search
-from omdbapi.movie_search import GetMovieException
+from omdbapi import GetMovie
+from omdbapi import GetMovieException
 
 
 @pytest.fixture
@@ -19,9 +19,9 @@ def get_movie(mocker):
         'Awards': 'Won 6 Oscars. Another 50 wins & 28 nominations.',
         'Response': 'True'
     }
-    get_mock = mocker.patch('omdbapi.movie_search.requests.get')
+    get_mock = mocker.patch('omdbapi.requests.get')
     get_mock.return_value = resp_mock
-    movie = movie_search.GetMovie(api_key='12345')
+    movie = GetMovie(api_keys='12345')
     return movie
 
 
@@ -35,7 +35,7 @@ def test_get_all_data(expected, get_movie):
 
 
 def test_repr():
-    movie = movie_search.GetMovie(api_key='12345')
+    movie = GetMovie(api_keys='12345')
     assert repr(movie) == "GetMovie(api_key='12345', values={})"
 
 
@@ -68,6 +68,6 @@ def test_data_key_not_found(get_movie):
 
 def test_get_data_invalid():
     with pytest.raises(GetMovieException) as e:
-        movie = movie_search.GetMovie(api_key='1111')
+        movie = GetMovie(api_keys='1111')
         movie.get_movie(title='star wars')
     assert str(e.value) == 'Invalid API key!'

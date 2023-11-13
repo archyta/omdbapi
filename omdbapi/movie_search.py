@@ -5,6 +5,6 @@ if __name__ == '__main__':
     import os
     api_keys = os.environ.get('APIKEY_OMDB')
     movie = GetMovie(api_keys=api_keys)
-    movie.get_movie(title='Interstellar', year='2014')
+    movie.get_movie(title='Exodus', year='1960')
     print(movie.values)
     print(movie.get_data('Director', 'Actors'))
