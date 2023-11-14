@@ -1,5 +1,6 @@
 __version__ = '0.7.0'
 
+import re
 from dataclasses import dataclass, field
 import random
 
@@ -29,13 +30,15 @@ class GetMovie:
     api_keys: str
     values: dict = field(default_factory=dict)
 
-    def get_movie(self, title, year=None, kind=None, plot=None):
+    def get_movie(self, title, year=None, kind='movie', plot=None, season=None, episode=None):
         """
         Get all data movie.
         :param title: movie title to search
         :param year: year the movie was released
         :param kind: movie, series or episode
         :param plot: by default return short plot
+        :param season: season number, optional
+        :param episode: episode number, optional if season is provided
         :Example:
         movie.get_movie(title='Interstellar', plot='full')
         """
@@ -44,7 +47,19 @@ class GetMovie:
         api_key = self.api_keys[random.randint(0, len(self.api_keys) - 1)]
 
         url = 'http://www.omdbapi.com/'
-        payload = {'t': title, 'y': year, 'type': kind, 'plot': plot, 'r': 'json', 'apikey': api_key}
+        # if title is imdbid like tt\d{7,8}, then use i=imdbid
+        if re.match(r'^tt\d{7,8}$', title):
+            payload = {'i': title,  'r': 'json', 'apikey': api_key}
+        else:
+            payload = {'t': title, 'type': kind, 'r': 'json', 'apikey': api_key}
+        if year:
+            payload['y'] = year
+        if plot:
+            payload['plot'] = plot  # full, short
+        if season:
+            payload['Season'] = season
+            if episode:
+                payload['Episode'] = episode
         print(payload)
         result = requests.get(url, params=payload).json()
 
@@ -68,7 +83,7 @@ class GetMovie:
         :Example:
         movie.get_data('Director', 'Actors')
         """
-        items = {item.lower(): self.values.get(item.lower(), 'key not found!') for item in args}
+        items = {item.lower(): self.values.get(item.lower(), f'key:{item} not found!') for item in args}
 
         return items
 
